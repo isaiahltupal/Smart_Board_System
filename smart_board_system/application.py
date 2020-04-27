@@ -4,103 +4,82 @@ Author: Ding Bayeta and Isaiah Tupal
 This is the main python fail and its task is to manage the functions and processes.
 
 """
-from math import floor
 import cv2
 import numpy as np
 
-#global variables
-mode = "Draw"
-tracked_colors = [[48,98,93,90,255,180]]
+
+#frames
+raw_frame, mask_frame, canvas, canvas_bg, canvas_full =[],[],[],[],[]
+
+#video
+video = None
+
+#point
+previous_point = [-1,-1]
 
 
 def none(x):
     pass
 
-
-def detect_palm_yolo(command_frame):
-     command_frame_gray = cv2.cvtColor(command_frame, cv2.COLOR_BGR2GRAY)
-
-
-def detect_palm(command_frame):
-    palm_cascade = cv2.CascadeClassifier("../resources/haarcascades/palm.xml")
-    command_frame_gray = cv2.cvtColor(command_frame, cv2.COLOR_BGR2GRAY)
-
-    palm_square = palm_cascade.detectMultiScale(command_frame_gray,1.1,4)
-    for (x,y,w,h) in palm_square:
-        cv2.rectangle(command_frame, (int(x), int(y)),(int(x+w), int(y+h)), (255, 0, 255), 3)
-
-
-# processes the frame of the file
-def process_frame(frame):
-    computed_value = floor(len(frame)*.25)
-    command_frame = frame[0:len(frame),0:computed_value]
-    detect_palm(command_frame)
-    cv2.imshow("command frame", command_frame)
-
-
-def show_hue(frame):
-    frame_hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-
-  # h_min = cv2.getTrackbarPos("Hue Min","TrackBars")
-   # s_min = cv2.getTrackbarPos("Sat Min","TrackBars")
-   # v_min = cv2.getTrackbarPos("Val Min","TrackBars")
-   # h_max = cv2.getTrackbarPos("Hue Max","TrackBars")
-   # s_max = cv2.getTrackbarPos("Sat Max","TrackBars")
-   # v_max = cv2.getTrackbarPos("Val Max","TrackBars")
-
-    lower = np.array([48,98,93])
-    upper = np.array([90,255,180])
-    mask = cv2.inRange(frame_hsv,lower,upper)
-
-    frame_result = cv2.bitwise_and(frame,frame,mask=mask)
-    cv2.imshow("mask",mask)
-    cv2.imshow("Color",frame_result)
-    computed_points = 0
-    computed_points2 = 0
-    locations = []
-    locations = cv2.findNonZero(mask)
-    x=0
+def draw_on_canvas(canvas,point):
+    none_array = [-1, -1]
     try:
-        for point in locations:
-            for point1 in point:
-                computed_points = point1[0]+computed_points
-                computed_points2 = point1[1]+computed_points2
-                x=x+1
-        computed_points=computed_points/x
-        computed_points2 =computed_points2/x
-        print(computed_points)
-        cv2.rectangle(frame, (0, 0), (int(computed_points),  int(computed_points2)), (255, 0, 255), 3)
+        cv2.circle(canvas, (point[0],point[1]), 4, (255, 0, 255), cv2.FILLED)
+        previous_point[0] = point[0]
+        previous_point[1] = point[1]
     except:
-        print("oop")
+        print("nopoint")
+    return canvas
+
+def get_pen_point(mask):
+    try:
+        mask_blur = cv2.GaussianBlur(mask, (7, 7), 1)
+        mask_canny = cv2.Canny(mask_blur,50,50)
+        contours,h = cv2.findContours(mask_canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+        contour = contours[0]
+
+        if cv2.contourArea(contour) > 5:
+            perimeter = cv2.arcLength(contour, True)
+            approxPoly = cv2.approxPolyDP(contour,0.02*perimeter,True)
+            x,y,w,h = cv2.boundingRect(approxPoly)
+            #for debugging purpose
+            point1 = (x,y)
+            point2 =( int(x+w), int(y+h) )
+            cv2.rectangle(mask,point1,point2,(255,0,255),10)
+            cv2.imshow("Mask",mask)
+            return [ int(x+w/2), int(y+h/2) ]
+        else:
+            return [-1,-1]
+    except:
+        return [-1,-1]
+
+
+def get_mask(frame):
+
+    lower = np.array([48, 98, 93])
+    upper = np.array([90,255,180])
+
+    frame_hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(frame_hsv,lower,upper)
+    return mask
 
 
 
-# contains the main loop of the program
 def main():
     video = cv2.VideoCapture(0)
-    # create trackbars for color change
-    cv2.namedWindow("TrackBars")
-    cv2.createTrackbar('Hue Min','TrackBars',0,179,none)
-    cv2.createTrackbar('Hue Max','TrackBars',179,179,none)
-    cv2.createTrackbar('Sat Min','TrackBars',0,255,none)
-    cv2.createTrackbar('Sat Max','TrackBars',255,255,none)
-    cv2.createTrackbar('Val Min','TrackBars',0,255,none)
-    cv2.createTrackbar('Val Max','TrackBars',255,255,none)
-
+    alert, frame = video.read()  # initial read to get dimensions
+    canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
     while True:
         alert, frame = video.read()
-        computed_points = floor(len(frame[0])*.25)
-        #process_frame(frame)
-        #cv2.rectangle(frame, (0, 0), (computed_points, len(frame)), (255, 0, 255), 3)
-
-
-        show_hue(frame)
-        cv2.imshow("Video Capture", frame)
-
+        frame = cv2.flip(frame,1)
+        mask = get_mask(frame)
+        point = get_pen_point(mask)
+        canvas = draw_on_canvas(canvas, point)
+        cv2.imshow("canvas",canvas)
+        cv2.imshow("Frame",frame)
         if cv2.waitKey(1) & 0xFF == ord('p'):
             break
-        cv2.waitKey(50)
+        cv2.waitKey(10)
 
 
-if __name__ == '__main__':
-    main()
+main()
