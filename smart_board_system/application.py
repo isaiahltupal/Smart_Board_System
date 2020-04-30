@@ -62,8 +62,15 @@ def draw_on_canvas(canvas, black_canvas, point, previous_point):
 def display_frame_with_overlay(canvas_frame, black_canvas, video_frame):
 
     canvas_frame = cv2.cvtColor(canvas_frame, cv2.COLOR_BGR2HLS_FULL)
-    cv2.addWeighted(black_canvas, 1.0, video_frame, 0.5, 0, video_frame)
-    cv2.addWeighted(canvas_frame, 1.0, video_frame, 1.0, 0, video_frame)
+    w = len(canvas_frame[0])
+    h = len(canvas_frame)
+    for i in range(0, h):
+        for j in range(0, w):
+
+            if canvas_frame[i, j].all(0):
+                video_frame[i, j] = canvas_frame[i, j]
+
+    #cv2.addWeighted(canvas_frame, 1.0, video_frame, 1.0, 0, video_frame)
     cv2.imshow("Video",video_frame)
 
 
@@ -134,7 +141,7 @@ def main():
         previous_point = point
         if cv2.waitKey(1) & 0xFF == ord('p'):
             break
-        cv2.waitKey(10)
+        cv2.waitKey(1)
 
 
 main()
