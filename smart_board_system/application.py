@@ -26,14 +26,16 @@ def none(x):
 """
 
 
-def draw_on_canvas_point(canvas, black_canvas, point):
+def draw_on_canvas_point(canvas, black_canvas, point, erase_mode):
 
-    cv2.circle(canvas, (point[0],point[1]), 4, (166, 0, 163), cv2.FILLED)
-    cv2.circle(black_canvas, (point[0], point[1]), 4, (0, 0, 0), cv2.FILLED)
+    if not erase_mode:
+        cv2.circle(canvas, (point[0],point[1]), 4, (166, 0, 163), cv2.FILLED)
+    else:
+        cv2.circle(black_canvas, (point[0], point[1]), 10, (0, 0, 0), cv2.FILLED)
     return black_canvas, canvas
 
 
-def draw_on_canvas(canvas, black_canvas, point, previous_point):
+def draw_on_canvas(canvas, erase_canvas, point, previous_point, erase_mode):
 
     """
     :param canvas: canvas layer to write on
@@ -50,27 +52,26 @@ def draw_on_canvas(canvas, black_canvas, point, previous_point):
     if point == [-1, -1]:
         pass
     elif previous_point == [-1, -1]:
-        black_canvas, canvas = draw_on_canvas_point(canvas, black_canvas,  point)
+        black_canvas, canvas = draw_on_canvas_point(canvas, erase_canvas,  point, erase_mode)
     else:
         point1 = (point[0], point[1])
         point2 = (previous_point[0], previous_point[1])
-        canvas = cv2.line(canvas, point1, point2, (166, 0, 163), 4)
-        black_canvas = cv2.line(black_canvas, point1, point2, (0, 0, 0), 4)
-    return black_canvas, canvas
+        if not erase_mode:
+            canvas = cv2.line(canvas, point1, point2, (166, 0, 163), 4)
+        else:
+            erase_canvas = cv2.line(erase_canvas, point1, point2, (166, 0, 163), 10)
+    return erase_canvas, canvas
 
 
-def display_frame_with_overlay(canvas_frame, black_canvas, video_frame):
+def display_frame_with_overlay(canvas_frame, erase_canvas, video_frame):
 
     canvas_frame = cv2.cvtColor(canvas_frame, cv2.COLOR_BGR2HLS_FULL)
-    w = len(canvas_frame[0])
-    h = len(canvas_frame)
-    for i in range(0, h):
-        for j in range(0, w):
+    erase_canvas = cv2.cvtColor(erase_canvas, cv2.COLOR_BGR2HLS_FULL)
 
-            if canvas_frame[i, j].all(0):
-                video_frame[i, j] = canvas_frame[i, j]
+    erase_canvas=cv2.bitwise_and(canvas_frame,erase_canvas)
+    canvas_frame = cv2.bitwise_xor(canvas_frame,erase_canvas)
 
-    #cv2.addWeighted(canvas_frame, 1.0, video_frame, 1.0, 0, video_frame)
+    cv2.addWeighted(canvas_frame, 1.0, video_frame, .4, .5, video_frame)
     cv2.imshow("Video",video_frame)
 
 
@@ -123,7 +124,7 @@ def main():
     canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
     black_canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
     previous_point = [-1,-1]
-
+    erase_mode = False
 
     while True:
         #looping statement
@@ -135,13 +136,16 @@ def main():
         frame = cv2.flip(frame,1)
         mask = get_mask(frame)
         point = get_pen_point(mask, previous_point)
-        black_canvas, canvas = draw_on_canvas(canvas, black_canvas , point, previous_point) #returns the canvas
+        erase_canvas, canvas = draw_on_canvas(canvas, black_canvas , point, previous_point, erase_mode) #returns the canvas
         display_frame_with_overlay(canvas, black_canvas, frame)
         # set point to previous_point before overwriting it in the next loop
         previous_point = point
-        if cv2.waitKey(1) & 0xFF == ord('p'):
+        k = cv2.waitKey(10)
+        if k & 0xFF == ord('e'):
+            erase_mode = True
+        if k & 0xFF == ord('w'):
+            erase_mode = False
+        if k & 0xFF == ord('p'):
             break
-        cv2.waitKey(1)
-
 
 main()
