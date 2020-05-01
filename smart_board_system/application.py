@@ -83,20 +83,18 @@ def display_frame_with_overlay(canvas_frame, erase_canvas, video_frame):
 def get_pen_point(mask,point):
     try:
         mask_blur = cv2.GaussianBlur(mask, (7, 7), 1)
-        mask_canny = cv2.Canny(mask_blur,50,50)
-        contours,h = cv2.findContours(mask_canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+        mask_canny = cv2.Canny(mask_blur ,50, 50)
+        contours, h = cv2.findContours(mask_canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
         contour = contours[0]
 
         if cv2.contourArea(contour) > 5:
             perimeter = cv2.arcLength(contour, True)
-            approxPoly = cv2.approxPolyDP(contour,0.02*perimeter,True)
-            x,y,w,h = cv2.boundingRect(approxPoly)
-            #for debugging purpose
-            point1 = (x,y)
-            point2 =( int(x+w), int(y+h) )
-            cv2.rectangle(mask,point1,point2,(255,0,255),10)
-            #cv2.imshow("Mask",mask)
-            return [ int(x+w/2), int(y+h/2) ]
+            approx_poly = cv2.approxPolyDP(contour,0.02*perimeter,True)
+            x, y, w, h = cv2.boundingRect(approx_poly)
+            point1 = (x, y)
+            point2 =(int(x+w), int(y+h))
+            cv2.rectangle(mask, point1, point2, (255, 0, 255), 10)
+            return [int(x+w/2), int(y+h/2)]
         else:
             return point
 
@@ -148,4 +146,6 @@ def main():
         if k & 0xFF == ord('p'):
             break
 
-main()
+
+if __name__ == '__main__':
+    main()
