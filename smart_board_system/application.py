@@ -1,3 +1,4 @@
+#!.../venv/lib/scripts python
 """
 Author: Ding Bayeta and Isaiah Tupal
 
@@ -63,15 +64,20 @@ def draw_on_canvas(canvas, erase_canvas, point, previous_point, erase_mode):
     return erase_canvas, canvas
 
 
-def display_frame_with_overlay(canvas_frame, erase_canvas, video_frame):
-
+def get_final_canvas(canvas_frame, erase_canvas):
     canvas_frame = cv2.cvtColor(canvas_frame, cv2.COLOR_BGR2HLS_FULL)
     erase_canvas = cv2.cvtColor(erase_canvas, cv2.COLOR_BGR2HLS_FULL)
 
-    erase_canvas=cv2.bitwise_and(canvas_frame,erase_canvas)
-    canvas_frame = cv2.bitwise_xor(canvas_frame,erase_canvas)
+    erase_canvas = cv2.bitwise_and(canvas_frame, erase_canvas)
+    canvas_final = cv2.bitwise_xor(canvas_frame, erase_canvas)
+    return canvas_final
 
-    cv2.addWeighted(canvas_frame, 1.0, video_frame, .4, .5, video_frame)
+
+def display_frame_with_overlay(canvas_frame, erase_canvas, video_frame):
+
+    canvas_final = get_final_canvas(canvas_frame,erase_canvas)
+
+    cv2.addWeighted(canvas_final, 1.0, video_frame, .4, .5, video_frame)
     cv2.imshow("Video",video_frame)
 
 
@@ -83,9 +89,10 @@ def display_frame_with_overlay(canvas_frame, erase_canvas, video_frame):
 def get_pen_point(mask,point):
     try:
         mask_blur = cv2.GaussianBlur(mask, (7, 7), 1)
-        mask_canny = cv2.Canny(mask_blur ,50, 50)
+        mask_canny = cv2.Canny(mask_blur,50, 50)
         contours, h = cv2.findContours(mask_canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
         contour = contours[0]
+
 
         if cv2.contourArea(contour) > 5:
             perimeter = cv2.arcLength(contour, True)
@@ -97,19 +104,63 @@ def get_pen_point(mask,point):
             return [int(x+w/2), int(y+h/2)]
         else:
             return point
+    except IndexError:
+        return [-1,-1]
 
-    except:
-        return point
+
+def get_settings():
+
+    f = open("../resources/variables.txt", "r")
+    lwr_string = f.readline()
+    upr_string = f.readline()
+    f.close()
+    lower = list(map(int, lwr_string.split()))
+    upper = list(map(int, upr_string.split()))
+    print(lower, upper)
+  #  lower = [48, 98, 93]list(map(int, test_list))
+  #  upper = [90, 255, 180]
+    return lower, upper
 
 
-def get_mask(frame):
+def get_mask(frame, l, u):
+    """
+    Returns the mask given the current frame and the
+    settings to isolate a color
+    :param frame:
+    :param l:
+    :param u:
+    :return:
+    """
+    lower = np.array(l)
+    upper = np.array(u)
 
-    lower = np.array([48, 98, 93])
-    upper = np.array([90,255,180])
-
-    frame_hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(frame_hsv,lower,upper)
+    frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(frame_hsv, lower, upper)
+    cv2.imshow("mask", mask)
     return mask
+
+
+def display_canvas_with_bg(canvas, erase_canvas):
+
+    canvas_final = get_final_canvas(canvas, erase_canvas)
+    bg = np.zeros([len(canvas), len(canvas[0]), 3], dtype=np.uint8)
+    bg.fill(255)
+    cv2.cvtColor(bg, cv2.COLOR_BGR2HLS_FULL)
+
+    bg_only_mark = cv2.bitwise_and(canvas_final, bg)
+    bg_real = cv2.bitwise_xor(bg, bg_only_mark)
+    cv2.imshow("Display", bg_real)
+    return bg_real
+
+def save_canvas(canvas_bg):
+    """
+    save the sanvas to a file
+    :param canvas_frame:
+    :param erase_canvas:
+    :return:
+    """
+    cv2.imwrite("drawing.jpg",canvas_bg)
+
 
 
 def main():
@@ -124,6 +175,8 @@ def main():
     previous_point = [-1,-1]
     erase_mode = False
 
+    lower,upper = get_settings()
+
     while True:
         #looping statement
         """
@@ -132,18 +185,21 @@ def main():
         """
         alert, frame = video.read()
         frame = cv2.flip(frame,1)
-        mask = get_mask(frame)
+        mask = get_mask(frame, lower, upper)
         point = get_pen_point(mask, previous_point)
         erase_canvas, canvas = draw_on_canvas(canvas, black_canvas , point, previous_point, erase_mode) #returns the canvas
         display_frame_with_overlay(canvas, black_canvas, frame)
+        canvas_with_bg = display_canvas_with_bg(canvas,black_canvas)
         # set point to previous_point before overwriting it in the next loop
         previous_point = point
         k = cv2.waitKey(10)
         if k & 0xFF == ord('e'):
             erase_mode = True
-        if k & 0xFF == ord('w'):
+        elif k & 0xFF == ord('w'):
             erase_mode = False
-        if k & 0xFF == ord('p'):
+        elif k & 0xFF == ord("s"):
+            save_canvas(canvas_with_bg)
+        elif k & 0xFF == ord('p'):
             break
 
 

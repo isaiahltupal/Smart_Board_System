@@ -32,23 +32,11 @@ def initialize():
     return video
 
 
-def get_mask(video_frame):
+def update_settings(video_frame):
     """
-       img = cv2.imread(path)
-    imgHSV = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-    h_min = cv2.getTrackbarPos("Hue Min","TrackBars")
-    h_max = cv2.getTrackbarPos("Hue Max", "TrackBars")
-    s_min = cv2.getTrackbarPos("Sat Min", "TrackBars")
-    s_max = cv2.getTrackbarPos("Sat Max", "TrackBars")
-    v_min = cv2.getTrackbarPos("Val Min", "TrackBars")
-    v_max = cv2.getTrackbarPos("Val Max", "TrackBars")
-    print(h_min,h_max,s_min,s_max,v_min,v_max)
-    lower = np.array([h_min,s_min,v_min])
-    upper = np.array([h_max,s_max,v_max])
-    mask = cv2.inRange(imgHSV,lower,upper)
-    imgResult = cv2.bitwise_and(img,img,mask=mask)
+     Displays and returns current color settings
     :param video_frame:
-    :return:
+    :return: upper,lower
     """
 
     frame_hsv = cv2.cvtColor(video_frame, cv2.COLOR_BGR2HSV)
@@ -63,6 +51,29 @@ def get_mask(video_frame):
     mask_frame = cv2.inRange(frame_hsv, lower, upper)
     color_frame = cv2.bitwise_and(video_frame, video_frame, mask=mask_frame)
     cv2.imshow("COLOR", color_frame)
+    return lower,upper
+
+
+def save_settings(lower,upper):
+    """
+    saves the settings into a txt file
+    :param lower: lower color threshold
+    :param upper: upper color threshold
+    :return:
+    """
+    lwr_string,upr_string = "", ""
+
+    for l in lower:
+        lwr_string = lwr_string+str(l)+" "
+
+    for u in upper:
+        upr_string = upr_string+str(u)+" "
+
+    f = open("../resources/variables.txt", "w")
+    f.write(lwr_string)
+    f.write("\n")
+    f.write(upr_string)
+    f.close()
 
 
 
@@ -70,9 +81,10 @@ def main():
     video=initialize()
     while True:
         alert, video_frame = video.read()
-        get_mask(video_frame)
+        lower,upper = update_settings(video_frame)
         k = cv2.waitKey(10)
         if k & 0xFF == ord('p'):
+            save_settings(lower, upper)
             break
 
 
