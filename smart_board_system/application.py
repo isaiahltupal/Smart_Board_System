@@ -9,14 +9,6 @@ import cv2
 import numpy as np
 
 
-#frames
-raw_frame, mask_frame, canvas_bg, canvas_full =[],[],[],[]
-
-#video
-video = None
-
-
-
 def none(x):
     pass
 
@@ -74,10 +66,20 @@ def get_final_canvas(canvas_frame, erase_canvas):
 
 
 def display_frame_with_overlay(canvas_frame, erase_canvas, video_frame):
+    """
+    Displays the output frame ( drawing on top of the  )
+    :param canvas_frame:
+    :param erase_canvas:
+    :param video_frame:
+    :return:
+    """
 
-    canvas_final = get_final_canvas(canvas_frame,erase_canvas)
-
+    canvas_final = get_final_canvas(canvas_frame, erase_canvas)
     cv2.addWeighted(canvas_final, 1.0, video_frame, .4, .5, video_frame)
+
+    cv2.putText(video_frame, "[W]WRITE [E]ERASE [Q]Quit [S]Save canvas as image", (75, 75), cv2.FONT_HERSHEY_SIMPLEX,
+                0.4, (200, 200, 200), 1)
+
     cv2.imshow("Video",video_frame)
 
 
@@ -117,8 +119,8 @@ def get_settings():
     lower = list(map(int, lwr_string.split()))
     upper = list(map(int, upr_string.split()))
     print(lower, upper)
-  #  lower = [48, 98, 93]list(map(int, test_list))
-  #  upper = [90, 255, 180]
+      #  lower = [48, 98, 93]list(map(int, test_list))
+      #  upper = [90, 255, 180]
     return lower, upper
 
 
@@ -152,6 +154,7 @@ def display_canvas_with_bg(canvas, erase_canvas):
     cv2.imshow("Display", bg_real)
     return bg_real
 
+
 def save_canvas(canvas_bg):
     """
     save the sanvas to a file
@@ -172,10 +175,10 @@ def main():
     alert, frame = video.read()  # initial read to get dimensions
     canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
     black_canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
-    previous_point = [-1,-1]
+    previous_point = [-1, -1]
     erase_mode = False
 
-    lower,upper = get_settings()
+    lower, upper = get_settings()
 
     while True:
         #looping statement
@@ -199,7 +202,7 @@ def main():
             erase_mode = False
         elif k & 0xFF == ord("s"):
             save_canvas(canvas_with_bg)
-        elif k & 0xFF == ord('p'):
+        elif k & 0xFF == ord('q'):
             break
 
 

@@ -50,8 +50,11 @@ def update_settings(video_frame):
     upper = np.array([h_max, s_max, v_max])
     mask_frame = cv2.inRange(frame_hsv, lower, upper)
     color_frame = cv2.bitwise_and(video_frame, video_frame, mask=mask_frame)
+    color_frame = cv2.flip(color_frame, 1)
+    cv2.putText(color_frame, "[S]Save settings and quit", (75, 75), cv2.FONT_HERSHEY_SIMPLEX,
+                0.7, (255, 255, 255), 2)
     cv2.imshow("COLOR", color_frame)
-    return lower,upper
+    return lower, upper
 
 
 def save_settings(lower,upper):
@@ -81,9 +84,9 @@ def main():
     video=initialize()
     while True:
         alert, video_frame = video.read()
-        lower,upper = update_settings(video_frame)
+        lower, upper = update_settings(video_frame)
         k = cv2.waitKey(10)
-        if k & 0xFF == ord('p'):
+        if k & 0xFF == ord('S'):
             save_settings(lower, upper)
             break
 
