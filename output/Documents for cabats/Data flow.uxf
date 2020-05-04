@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3.0">
+  <help_text/>
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>216</x>
+      <y>408</y>
+      <w>48</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>User</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>440</x>
+      <y>104</y>
+      <w>352</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;subsystem&gt;&gt;
+Setup
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>496</x>
+      <y>504</y>
+      <w>104</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;process&gt;&gt;
+1
+Get video frame </panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>440</x>
+      <y>680</y>
+      <w>112</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;process&gt;&gt;
+3
+Display frames</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>848</x>
+      <y>368</y>
+      <w>80</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;entity&gt;&gt;
+variables</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>608</x>
+      <y>608</y>
+      <w>112</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;process&gt;&gt;
+2
+process video 
+frame</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>256</x>
+      <y>448</y>
+      <w>256</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+webcam 
+data</panel_attributes>
+    <additional_attributes>300.0;110.0;230.0;110.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>536</x>
+      <y>544</y>
+      <w>88</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+Frame</panel_attributes>
+    <additional_attributes>90.0;120.0;10.0;120.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>544</x>
+      <y>656</y>
+      <w>112</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+canvas
+output frame</panel_attributes>
+    <additional_attributes>10.0;60.0;120.0;60.0;120.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>248</x>
+      <y>456</y>
+      <w>208</w>
+      <h>272</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+output 
+frames
+</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;320.0;240.0;320.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>712</x>
+      <y>400</y>
+      <w>192</w>
+      <h>248</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+settings</panel_attributes>
+    <additional_attributes>10.0;290.0;220.0;290.0;220.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>664</x>
+      <y>256</y>
+      <w>104</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;process&gt;&gt;
+3
+process frame</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>464</x>
+      <y>184</y>
+      <w>104</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;process&gt;&gt;
+1
+Get video frame </panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>464</x>
+      <y>344</y>
+      <w>104</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;process&gt;&gt;
+2
+Update settings</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>256</x>
+      <y>192</y>
+      <w>224</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+webcam
+data</panel_attributes>
+    <additional_attributes>260.0;20.0;50.0;20.0;10.0;280.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>200</y>
+      <w>216</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+webcam
+data</panel_attributes>
+    <additional_attributes>200.0;70.0;200.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>560</x>
+      <y>296</y>
+      <w>224</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+Value
+Hue
+Saturation</panel_attributes>
+    <additional_attributes>200.0;10.0;200.0;90.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>544</x>
+      <y>256</y>
+      <w>136</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+processed
+frames</panel_attributes>
+    <additional_attributes>10.0;20.0;150.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>448</x>
+      <y>256</y>
+      <w>104</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;process&gt;&gt;
+3
+Display frames</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>264</x>
+      <y>280</y>
+      <w>200</w>
+      <h>176</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+Output frames</panel_attributes>
+    <additional_attributes>10.0;200.0;70.0;40.0;230.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>760</x>
+      <y>264</y>
+      <w>184</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+settings</panel_attributes>
+    <additional_attributes>160.0;130.0;160.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>432</x>
+      <y>464</y>
+      <w>320</w>
+      <h>296</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;subsystem&gt;&gt;
+Application
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
