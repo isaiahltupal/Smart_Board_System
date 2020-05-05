@@ -26,5 +26,5 @@ Running the smart board is simple. Just execute application.py and you can now w
 * press [s]: saves a jpeg image of your drawing
 * press [q]: quit
 ![img](resources/image/main.png)
-
+####Video Demo: https://youtu.be/6hkHylH-MEE
 
