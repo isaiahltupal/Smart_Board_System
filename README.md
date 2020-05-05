@@ -19,6 +19,12 @@ a webcam
 4. Do steps 2 and 3 for VAL and SAT
 ![img](resources/image/setup_isolated.png)
 5. Press S to save
-###Running 
+###Running the Smart  Board
+Running the smart board is simple. Just execute application.py and you can now write them down. There are different modes
+* press [w]: write mode, lets the user draw on the screen
+* press [e]: lets the user erase the drawing on the screen
+* press [s]: saves a jpeg image of your drawing
+* press [q]: quit
+![img](resources/image/main.png)
 
 
