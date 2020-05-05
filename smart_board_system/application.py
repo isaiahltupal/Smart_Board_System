@@ -57,9 +57,6 @@ def draw_on_canvas(canvas, erase_canvas, point, previous_point, erase_mode):
 
 
 def get_final_canvas(canvas_frame, erase_canvas):
-    canvas_frame = cv2.cvtColor(canvas_frame, cv2.COLOR_BGR2HLS_FULL)
-    erase_canvas = cv2.cvtColor(erase_canvas, cv2.COLOR_BGR2HLS_FULL)
-
     erase_canvas = cv2.bitwise_and(canvas_frame, erase_canvas)
     canvas_final = cv2.bitwise_xor(canvas_frame, erase_canvas)
     return canvas_final
@@ -81,6 +78,7 @@ def display_frame_with_overlay(canvas_frame, erase_canvas, video_frame):
                 0.4, (200, 200, 200), 1)
 
     cv2.imshow("Video",video_frame)
+    return canvas_final
 
 
 """
@@ -142,14 +140,14 @@ def get_mask(frame, l, u):
     return mask
 
 
-def display_canvas_with_bg(canvas, erase_canvas):
+def display_canvas_with_bg(canvas):
 
-    canvas_final = get_final_canvas(canvas, erase_canvas)
+
     bg = np.zeros([len(canvas), len(canvas[0]), 3], dtype=np.uint8)
     bg.fill(255)
     cv2.cvtColor(bg, cv2.COLOR_BGR2HLS_FULL)
 
-    bg_only_mark = cv2.bitwise_and(canvas_final, bg)
+    bg_only_mark = cv2.bitwise_and(canvas, bg)
     bg_real = cv2.bitwise_xor(bg, bg_only_mark)
     cv2.imshow("Display", bg_real)
     return bg_real
@@ -175,6 +173,11 @@ def main():
     alert, frame = video.read()  # initial read to get dimensions
     canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
     black_canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
+
+    canvas = cv2.cvtColor(canvas, cv2.COLOR_BGR2HLS_FULL)
+    black_canvas = cv2.cvtColor(black_canvas, cv2.COLOR_BGR2HLS_FULL)
+
+
     previous_point = [-1, -1]
     erase_mode = False
 
@@ -191,8 +194,8 @@ def main():
         mask = get_mask(frame, lower, upper)
         point = get_pen_point(mask, previous_point)
         erase_canvas, canvas = draw_on_canvas(canvas, black_canvas , point, previous_point, erase_mode) #returns the canvas
-        display_frame_with_overlay(canvas, black_canvas, frame)
-        canvas_with_bg = display_canvas_with_bg(canvas,black_canvas)
+        canvas = display_frame_with_overlay(canvas, black_canvas, frame)
+        canvas_with_bg = display_canvas_with_bg(canvas)
         # set point to previous_point before overwriting it in the next loop
         previous_point = point
         k = cv2.waitKey(10)
@@ -200,6 +203,8 @@ def main():
             erase_mode = True
         elif k & 0xFF == ord('w'):
             erase_mode = False
+            black_canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
+            black_canvas = cv2.cvtColor(black_canvas, cv2.COLOR_BGR2HLS_FULL)
         elif k & 0xFF == ord("s"):
             save_canvas(canvas_with_bg)
         elif k & 0xFF == ord('q'):
