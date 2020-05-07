@@ -23,8 +23,11 @@ a webcam
 Running the smart board is simple. Just execute application.py and you can now write them down. There are different modes
 * press [w]: write mode, lets the user draw on the screen
 * press [e]: lets the user erase the drawing on the screen
+* press [f]: clear all drawing on the screen
 * press [s]: saves a jpeg image of your drawing
 * press [q]: quit
+* press [r]: start recording
+* press [t]: stop recording
 ![img](resources/image/main.png)
 ### Video Demo: https://youtu.be/6hkHylH-MEE
 
