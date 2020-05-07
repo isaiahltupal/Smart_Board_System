@@ -1,9 +1,6 @@
 #!.../venv/lib/scripts python
 """
-Author: Ding Bayeta and Isaiah Tupal
-
 This is the main python fail and its task is to manage the functions and processes.
-
 """
 import cv2
 import numpy as np
@@ -74,12 +71,12 @@ def display_frame_with_overlay(canvas_frame, erase_canvas, video_frame):
     canvas_final = get_final_canvas(canvas_frame, erase_canvas)
     cv2.addWeighted(canvas_final, 1.0, video_frame, .4, .5, video_frame)
 
-    cv2.putText(video_frame, "[W]WRITE [E]ERASE [Q]Quit [S]Save canvas as image", (75, 75), cv2.FONT_HERSHEY_SIMPLEX,
+    cv2.putText(video_frame, "[W]WRITE [E]ERASE [Q]Quit [S]Save canvas as image", (75, 65), cv2.FONT_HERSHEY_SIMPLEX,
                 0.4, (200, 200, 200), 1)
-
+    cv2.putText(video_frame, "[F] Clear all [R]Start recording [T]Stop recording", (75, 85), cv2.FONT_HERSHEY_SIMPLEX,
+                0.4, (200, 200, 200), 1)
     cv2.imshow("Video",video_frame)
     return canvas_final
-
 
 """
     gets the coordinates of the object being tracked
@@ -155,13 +152,12 @@ def display_canvas_with_bg(canvas):
 
 def save_canvas(canvas_bg):
     """
-    save the sanvas to a file
+    save the canvas to a file
     :param canvas_frame:
     :param erase_canvas:
     :return:
     """
     cv2.imwrite("drawing.jpg",canvas_bg)
-
 
 
 def main():
@@ -173,14 +169,15 @@ def main():
     alert, frame = video.read()  # initial read to get dimensions
     canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
     black_canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
-
     canvas = cv2.cvtColor(canvas, cv2.COLOR_BGR2HLS_FULL)
     black_canvas = cv2.cvtColor(black_canvas, cv2.COLOR_BGR2HLS_FULL)
 
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter('recording.avi', fourcc, 20.0, (640,480))
 
     previous_point = [-1, -1]
     erase_mode = False
-
+    record_mode = False
     lower, upper = get_settings()
 
     while True:
@@ -196,20 +193,41 @@ def main():
         erase_canvas, canvas = draw_on_canvas(canvas, black_canvas , point, previous_point, erase_mode) #returns the canvas
         canvas = display_frame_with_overlay(canvas, black_canvas, frame)
         canvas_with_bg = display_canvas_with_bg(canvas)
-        # set point to previous_point before overwriting it in the next loop
+
+        if(record_mode):
+            out.write(frame)
+
+        # Set point to previous_point before overwriting it in the next loop
         previous_point = point
         k = cv2.waitKey(10)
+
+        # Activate erase mode
         if k & 0xFF == ord('e'):
             erase_mode = True
+        # Clear canvas
+        if k & 0xFF == ord('f'):
+            canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
+            black_canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
+            canvas = cv2.cvtColor(canvas, cv2.COLOR_BGR2HLS_FULL)
+            black_canvas = cv2.cvtColor(black_canvas, cv2.COLOR_BGR2HLS_FULL)
+        # Activate write mode
         elif k & 0xFF == ord('w'):
             erase_mode = False
             black_canvas = (np.zeros((len(frame), len(frame[0]), 4), dtype=np.uint8))
             black_canvas = cv2.cvtColor(black_canvas, cv2.COLOR_BGR2HLS_FULL)
-        elif k & 0xFF == ord("s"):
+        # Save current frame to project folder
+        elif k & 0xFF == ord('s'):
             save_canvas(canvas_with_bg)
+        # Quits program
         elif k & 0xFF == ord('q'):
             break
-
+        # Starts recording
+        elif k & 0xFF == ord('r'):
+            record_mode = True
+        # Stops recording, saving video output
+        elif k & 0xFF == ord('t'):
+            record_mode = False
+            if (out.isOpened()): out.release()
 
 if __name__ == '__main__':
     main()
