@@ -29,5 +29,5 @@ Running the smart board is simple. Just execute application.py and you can now w
 * press [r]: start recording
 * press [t]: stop recording
 ![img](resources/image/main.png)
-### Video Demo: https://youtu.be/6hkHylH-MEE
-
+### Video Demo part 1: https://youtu.be/6hkHylH-MEE
+### Video Demo part 2: https://youtu.be/AzdrTV-5Xvc
